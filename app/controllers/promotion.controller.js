@@ -22,16 +22,18 @@ exports.createPromotion = async (req, res) => {
 };
   
 // Fetch all Promotions
-exports.getPromotions = (req, res) => {
+exports.getPromotions = async (req, res) => {
     console.log("getPromotions function called");
     console.log(req.query.page)
     const pageNumber = Number(req.query.page);
     const limit = 50;
+    const totalPages = await Promotion.countDocuments();
+    console.log(totalPages)
     Promotion.find().select('-__v')
     .limit(limit)
     .skip((pageNumber - 1) * limit)
     .then(async promotionInfo => {
-          res.status(200).json(promotionInfo);
+          res.status(200).json({promotionInfo, totalPages: Math.ceil(totalPages / limit)});
         }).catch(error => {
           console.log(error);
           res.status(500).json({
@@ -42,26 +44,29 @@ exports.getPromotions = (req, res) => {
 };
 
 // Get a promotion by Id
-exports.getPromotion = (req, res) => {
+exports.getPromotion =async (req, res) => {
   console.log("getPromotionById function called");
-  let promotionId = req.params.id;
+  try{ const promotionId = await req.params.id;
   Promotion.findById(promotionId)
-  .then(promotionInfo => {
-    res.status(200).json(promotionInfo);
-  }).catch(error => {
+  (promotionInfo => {
+    res.status(200).json(promotionInfo);}
+ 
+  )}
+  catch{(error => {
     console.log(error);
     res.status(500).json({
         message: "Error fetching promotions!",
         error: error
     });
   });
-};
+};}
+  
  
 // UPDATE a Promotion
 exports.updatePromotion = async (req, res) => {
     // Find promotion and update it
     console.log("updatePromotion function called");
-    let promotionId = req.body.promotionData._id;
+    const promotionId = req.body.promotionData._id;
     Promotion.findByIdAndUpdate(
         promotionId, 
         req.body.promotionData, 
@@ -81,7 +86,7 @@ exports.updatePromotion = async (req, res) => {
 // DELETE a promotion
 exports.deletePromotion = async (req, res) => {
     console.log("deletePromotion function called");
-    let promotionId = req.params.id;
+    const promotionId = req.params.id;
     Promotion.findByIdAndRemove(promotionId)
     .then(promotion => {
         res.status(200).json("success delete promotion");
@@ -112,11 +117,10 @@ exports.generatePromotions = async (req, res) => {
                         break;         
                 }
                 if(columns[key] instanceof Array){
-                    let randomIndex = Math.floor(Math.random() * columns[key].length);
+                    const randomIndex = Math.floor(Math.random() * columns[key].length);
                     newPormotion[key] =columns[key][randomIndex];
                 }
-
-            });  
+            }); 
             const promotionData = new Promotion(newPormotion);
             promotionData.save()
             .then((data) => { 
@@ -136,5 +140,4 @@ exports.generatePromotions = async (req, res) => {
         error: error
     });
   });
-//    console.log(JSON.stringify(promotionInfo))
 }
