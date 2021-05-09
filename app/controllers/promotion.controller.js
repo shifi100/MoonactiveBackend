@@ -44,22 +44,20 @@ exports.getPromotions = async (req, res) => {
 };
 
 // Get a promotion by Id
-exports.getPromotion =async (req, res) => {
-  console.log("getPromotionById function called");
-  try{ const promotionId = await req.params.id;
-  Promotion.findById(promotionId)
-  (promotionInfo => {
-    res.status(200).json(promotionInfo);}
- 
-  )}
-  catch{(error => {
-    console.log(error);
-    res.status(500).json({
-        message: "Error fetching promotions!",
-        error: error
+exports.getPromotion = (req, res) => {
+    console.log("getPromotionById function called");
+    let promotionId = req.params.id;
+    Promotion.findById(promotionId)
+    .then(promotionInfo => {
+      res.status(200).json(promotionInfo);
+    }).catch(error => {
+      console.log(error);
+      res.status(500).json({
+          message: "Error fetching promotions!",
+          error: error
+      });
     });
-  });
-};}
+  };
   
  
 // UPDATE a Promotion
