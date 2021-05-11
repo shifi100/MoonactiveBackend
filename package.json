@@ -1,5 +1,5 @@
 {
-  "name": "Promotions project",
+  "name": "promotions",
   "version": "1.0.0",
   "description": "Nodejs CRUD restapi MongoDB",
   "main": "index.js",

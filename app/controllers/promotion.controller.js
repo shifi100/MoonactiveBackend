@@ -6,19 +6,23 @@ const PromotionColumns = require('../models/promotionColumns.model')
 exports.createPromotion = async (req, res) => {
     console.log("createPromotions function called");
     const promotionData = new Promotion(req.body.promotionData);
-    promotionData.save()
-    .then((data) => { 
+    try{
+      const data=await promotionData.save()
+    ((data) => { 
         console.log("new promotion added")
         res.status(200).json(data);
      })
-    .catch((err) => {
+    }
+   catch{
+       ((err) => {
         console.log("failed to add new promotion") 
         console.log(err);
         res.status(500).json({
             message: "Fail to save new promotion!",
             error: err.message
         });
-    })
+    })}
+
 };
   
 // Fetch all Promotions
